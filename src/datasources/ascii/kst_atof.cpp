@@ -19,14 +19,16 @@
 #include <ctype.h>
 
 #include <QLocale>
-
+#include <QTime>
+#include <QDateTime>
+#include <QDebug>
 
 #define LOGHUGE 39
 
 
 //-------------------------------------------------------------------------------------------
 #ifdef KST_USE_KST_ATOF
-double LexicalCast::toDouble(const char* signedp) const
+double LexicalCast::fromDouble(const char* signedp) const
 {
 	unsigned char* p = (unsigned char*)signedp;
 	unsigned char c;
@@ -119,6 +121,20 @@ double LexicalCast::toDouble(const char* signedp) const
 
 
 //-------------------------------------------------------------------------------------------
+LexicalCast::AutoReset::AutoReset(bool useDot)
+{
+  instance().setDecimalSeparator(useDot);
+}
+
+//-------------------------------------------------------------------------------------------
+LexicalCast::AutoReset::~AutoReset()
+{
+  instance().resetLocal();
+  instance()._isTime = false;
+  instance()._timeFormat.clear();
+}
+
+//-------------------------------------------------------------------------------------------
 LexicalCast& LexicalCast::instance()
 {
   static LexicalCast lexcInstance;
@@ -126,7 +142,7 @@ LexicalCast& LexicalCast::instance()
 }
 
 //-------------------------------------------------------------------------------------------
-LexicalCast::LexicalCast()
+LexicalCast::LexicalCast() : _isTime(false), _timeWithDate(false)
 {
 }
 
@@ -167,6 +183,43 @@ char LexicalCast::localSeparator() const
 {
   return *setlocale(LC_NUMERIC, 0);
 }
+
+//-------------------------------------------------------------------------------------------
+void LexicalCast::setTimeFormat(const QString& format)
+{
+  _timeFormat = format;
+  _isTime = !format.isEmpty();
+  _timeWithDate = format.contains("d") || format.contains("M") || format.contains("y");
+}
+
+//-------------------------------------------------------------------------------------------
+double LexicalCast::fromTime(const char* p) const
+{
+  int maxScan = 100;
+  int end = 0;
+  for (; *(p + end) != ' ' && *(p + end) != '\t'; end++) {
+    if (end > maxScan)
+      return 0;
+  }
+  QString time;
+  time = QString::fromLatin1(p, end);
+
+  double ms;
+  if (_timeWithDate) {
+    static QDateTime t;
+    t = QDateTime::fromString(time, _timeFormat);
+    ms = t.toMSecsSinceEpoch();
+    //qDebug() << time << ": " << t.toString(_timeFormat) << " = " << ms;
+  } else {
+    static QTime t;
+    t = QTime::fromString(time, _timeFormat);
+    static QTime t0 = t;
+    ms = t0.msecsTo(t);
+    //qDebug() << time << ": " << t.toString(_timeFormat) << " = " << ms;
+  }
+  return ms;
+}
+
 
 
 // vim: ts=2 sw=2 et
