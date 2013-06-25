@@ -207,7 +207,7 @@ ScriptServer::ScriptServer(ObjectStore *obj) : _server(new QLocalServer(this)), 
     _fnMap.insert("String::value()",&ScriptServer::stringValue);
     _fnMap.insert("String::setValue()",&ScriptServer::stringSetValue);
     _fnMap.insert("Scalar::value()",&ScriptServer::scalarValue);
-    _fnMap.insert("Scalar::setValue()",&ScriptServer::scalarSetValue);
+    _fnMap.insert("PSMLGetSelected()",&ScriptServer::PSMLGetSelected);
 
     _fnMap.insert("commands()",&ScriptServer::commands);
 
@@ -1616,6 +1616,18 @@ QByteArray ScriptServer::scalarSetValue(QByteArray&command, QLocalSocket* s,Obje
     } else {
         return handleResponse("No such object (variables not supported)",s,0,"",0,0);;
     }
+}
+
+extern double PSML_Selected_x;
+extern double PSML_Selected_y;
+
+QByteArray ScriptServer::PSMLGetSelected(QByteArray&command, QLocalSocket* s,ObjectStore*,const int&,
+                                     const QByteArray&,IfSI*&,VarSI*) {
+
+  char vals[80];
+  snprintf(vals, 80, "%lf %lf",  PSML_Selected_x, PSML_Selected_y);
+  //fprintf(stderr, vals);
+  return handleResponse(vals,s,0,"",0,0);
 }
 
 }

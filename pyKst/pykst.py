@@ -259,9 +259,8 @@ class NamedObject:
     """ Sets a descriptive name for this object. Descriptive names may be non-unique, and as such should not be used as handles. """
     self.client.send("#setName("+self.handle.toAscii()+","+name+")")
 
-
-
-
+def PSMLGetSelected(client):
+    return QtCore.QString(client.send("PSMLGetSelected()"))
 
 class Scalar(NamedObject):
   """ This is a class which some convenience classes within pykst use. You should not use it directly. """
@@ -274,7 +273,7 @@ class Scalar(NamedObject):
     
   def setValue(self,val):
     """ This function should only be used with GeneratedScalars and ExistingScalars. """
-    self.client.send("Scalar::value("+self.handle+","+b2str(val)+")")
+    self.client.send("Scalar::setValue("+self.handle+","+b2str(val)+")")
     
 class DataSourceScalar(Scalar):
   """ This class represents a scalar you would create via "Create>Scalar>Read from Data Source" from the menubar inside kst.

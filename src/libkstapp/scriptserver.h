@@ -211,6 +211,9 @@ protected:
     QByteArray scalarSetValue(QByteArray& command, QLocalSocket* s,ObjectStore*_store,const int&ifMode, const QByteArray&ifString,IfSI*& ifStat,VarSI*var);
     //Scalar::setValue(
 
+    QByteArray PSMLGetSelected(QByteArray& command, QLocalSocket* s,ObjectStore*_store,const int&ifMode, const QByteArray&ifString,IfSI*& ifStat,VarSI*var);
+    //PSMLGetSelected(
+
 };
 
 

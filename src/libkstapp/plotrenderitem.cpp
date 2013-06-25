@@ -623,7 +623,9 @@ void PlotRenderItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
   }
 }
 
-
+  double PSML_Selected_x = 0;
+  double PSML_Selected_y = 0;
+  
 void PlotRenderItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (view()->viewMode() != View::Data) {
     event->ignore();
@@ -647,6 +649,12 @@ void PlotRenderItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     _selectionRect.setTo(QPointF(p.x(), rect().bottom()));
   } else {
     _selectionRect.setFrom(p);
+  }
+
+  if (_highlightPointActive == true) {
+    PSML_Selected_x = _highlightPoint.x();
+    PSML_Selected_y = _highlightPoint.y();
+    //fprintf(stderr, "x=%lf y=%lf\n", PSML_Selected_x, PSML_Selected_y);
   }
 }
 
